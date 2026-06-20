@@ -26,4 +26,4 @@ jobs:
           context: .
           platforms: linux/amd64
           push: true
-          tags: yishaym/server:1.0
+          tags: ishaymdocker/server:1.0
