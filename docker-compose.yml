@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: theshultz/kaplat-books-postgres-instance:latest
+    ports:
+      - "5432:5432"
+
+  mongo:
+    image: theshultz/kaplat-books-mongo-instance:latest
+    ports:
+      - "27017:27017"
+
+  app:
+    image: ${APP_IMAGE:-ishaymdocker/books-database:1.0}
+    restart: on-failure:2
+    ports:
+      - "4785:8574"
+    depends_on:
+      - postgres
+      - mongo
