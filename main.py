@@ -1,11 +1,13 @@
 # ======================== imports ========================
-#           !!! Using only built-in libraries !!!
+#             Books HTTP server
 # =========================================================
 import json
 import os
 import shutil
 import sys
 import time
+
+import database
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Any
@@ -52,7 +54,6 @@ LOG_LEVEL_PRIORITY: dict[str, int] = {
 
 
 # ======================== data storage ========================
-books: dict[int, dict[str, Any]] = {}
 next_book_id: int = 1
 
 # First incoming request receives number 1.
@@ -255,6 +256,15 @@ def is_valid_genre_list(genres: Any) -> bool:
     return True
 
 
+def parse_persistence_method(query_params: dict[str, list[str]]) -> str:
+    persistence_method = get_first_query_param(query_params, "persistenceMethod")
+
+    if persistence_method not in {"POSTGRES", "MONGO"}:
+        raise ValueError("Missing or invalid persistenceMethod")
+
+    return persistence_method
+
+
 def parse_genres_filter(query_params: dict[str, list[str]]) -> set[str] | None:
     raw_genres = get_first_query_param(query_params, "genres")
 
@@ -276,18 +286,20 @@ def parse_genres_filter(query_params: dict[str, list[str]]) -> set[str] | None:
 def find_book_by_title(title: str) -> dict[str, Any] | None:
     normalized_title = normalize_book_title(title)
 
-    for book in books.values():
+    for book in database.get_all_books("POSTGRES"):
         if normalize_book_title(book["title"]) == normalized_title:
             return book
 
     return None
 
 
-def get_book_by_id(book_id: int) -> dict[str, Any] | None:
-    return books.get(book_id)
+def get_book_by_id(book_id: int, persistence_method: str = "POSTGRES") -> dict[str, Any] | None:
+    return database.get_book_by_id(book_id, persistence_method)
 
 
-def apply_book_filters(query_params: dict[str, list[str]]) -> list[dict[str, Any]]:
+def apply_book_filters(
+    query_params: dict[str, list[str]], persistence_method: str
+) -> list[dict[str, Any]]:
     author_filter = get_first_query_param(query_params, "author")
 
     price_bigger_than = parse_optional_int_query_param(query_params, "price-bigger-than")
@@ -299,7 +311,7 @@ def apply_book_filters(query_params: dict[str, list[str]]) -> list[dict[str, Any
 
     filtered_books: list[dict[str, Any]] = []
 
-    for book in books.values():
+    for book in database.get_all_books(persistence_method):
         if author_filter is not None:
             if book["author"].lower() != author_filter.lower():
                 continue
@@ -392,7 +404,7 @@ def create_book(book_data: dict[str, Any]) -> int:
         "genres": genres,
     }
 
-    books[new_book_id] = new_book
+    database.create_book(new_book)
     next_book_id += 1
 
     return new_book_id
@@ -405,18 +417,16 @@ def update_book_price(book_id: int, new_price: int) -> int | None:
         return None
 
     old_price = book["price"]
-    book["price"] = new_price
+    database.update_book_price(book_id, new_price)
 
     return old_price
 
 
 def delete_book(book_id: int) -> int | None:
-    if book_id not in books:
+    if get_book_by_id(book_id) is None:
         return None
 
-    del books[book_id]
-
-    return len(books)
+    return database.delete_book(book_id)
 
 
 # ======================== Request Handler ========================
@@ -622,7 +632,7 @@ class BookStoreRequestHandler(BaseHTTPRequestHandler):
             book_data = read_json_body(self)
 
             new_book_title = book_data.get("title")
-            existing_books_count = len(books)
+            existing_books_count = database.get_books_count("POSTGRES")
             new_book_id = next_book_id
 
             created_book_id = create_book(book_data)
@@ -741,7 +751,8 @@ class BookStoreRequestHandler(BaseHTTPRequestHandler):
     # ------------------------ concrete GET handlers ------------------------
     def handle_get_books_total(self, query_params: dict[str, list[str]], request_number: int) -> None:
         try:
-            filtered_books = apply_book_filters(query_params)
+            persistence_method = parse_persistence_method(query_params)
+            filtered_books = apply_book_filters(query_params, persistence_method)
 
         except ValueError as error:
             self.send_bad_request_response(str(error))
@@ -758,7 +769,8 @@ class BookStoreRequestHandler(BaseHTTPRequestHandler):
 
     def handle_get_books(self, query_params: dict[str, list[str]], request_number: int) -> None:
         try:
-            filtered_books = apply_book_filters(query_params)
+            persistence_method = parse_persistence_method(query_params)
+            filtered_books = apply_book_filters(query_params, persistence_method)
 
         except ValueError as error:
             self.send_bad_request_response(str(error))
@@ -777,12 +789,13 @@ class BookStoreRequestHandler(BaseHTTPRequestHandler):
     def handle_get_single_book(self, query_params: dict[str, list[str]], request_number: int) -> None:
         try:
             book_id = parse_required_int_query_param(query_params, "id")
+            persistence_method = parse_persistence_method(query_params)
 
         except ValueError as error:
             self.send_bad_request_response(str(error))
             return
 
-        book = get_book_by_id(book_id)
+        book = get_book_by_id(book_id, persistence_method)
 
         if book is None:
             error_message = f"Error: no such Book with id {book_id}"
@@ -803,8 +816,13 @@ class BookStoreRequestHandler(BaseHTTPRequestHandler):
 
 # ======================== Server runner ========================
 def run_server() -> None:
+    global next_book_id
+
     setup_logs_folder()
     setup_loggers()
+
+    database.connect_databases()
+    next_book_id = database.get_highest_book_id() + 1
 
     server = HTTPServer((HOST, PORT), BookStoreRequestHandler)
 
