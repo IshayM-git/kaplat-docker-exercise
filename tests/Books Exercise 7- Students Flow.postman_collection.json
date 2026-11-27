@@ -1,0 +1,869 @@
+{
+	"info": {
+		"_postman_id": "124316a3-1ce3-48e7-b3a9-808ce48d88b8",
+		"name": "Books Exercise 7: Students Flow",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "16700889",
+		"_collection_link": "https://mta-automation.postman.co/workspace/practical-tools~fc617429-33d3-44a1-b6b1-81e38fff92da/collection/16700889-124316a3-1ce3-48e7-b3a9-808ce48d88b8?action=share&source=collection_link&creator=16700889"
+	},
+	"item": [
+		{
+			"name": "Health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:{{port}}/books/health",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"books",
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get total Books from POSTGRES",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Initial quanitiy of 2 books in postgres DB\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.result).to.eql(2);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:{{port}}/books/total?persistenceMethod=POSTGRES",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"books",
+						"total"
+					],
+					"query": [
+						{
+							"key": "author",
+							"value": "abc",
+							"disabled": true
+						},
+						{
+							"key": "price-bigger-than",
+							"value": "65",
+							"disabled": true
+						},
+						{
+							"key": "price-less-than",
+							"value": "88",
+							"disabled": true
+						},
+						{
+							"key": "year-bigger-than",
+							"value": "1998",
+							"disabled": true
+						},
+						{
+							"key": "year-less-than",
+							"value": "2000",
+							"disabled": true
+						},
+						{
+							"key": "genres",
+							"value": "PROFESSIONAL",
+							"disabled": true
+						},
+						{
+							"key": "persistenceMethod",
+							"value": "POSTGRES"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get total Books from MONGO",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Initial quanitiy of 2 books in postgres DB\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.result).to.eql(2);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:{{port}}/books/total?persistenceMethod=MONGO",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"books",
+						"total"
+					],
+					"query": [
+						{
+							"key": "author",
+							"value": "abc",
+							"disabled": true
+						},
+						{
+							"key": "price-bigger-than",
+							"value": "65",
+							"disabled": true
+						},
+						{
+							"key": "price-less-than",
+							"value": "88",
+							"disabled": true
+						},
+						{
+							"key": "year-bigger-than",
+							"value": "1998",
+							"disabled": true
+						},
+						{
+							"key": "year-less-than",
+							"value": "2000",
+							"disabled": true
+						},
+						{
+							"key": "genres",
+							"value": "PROFESSIONAL",
+							"disabled": true
+						},
+						{
+							"key": "persistenceMethod",
+							"value": "MONGO"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create existing Book by title",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Should not succeed create a Book that already exists by its title\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.errorMessage).to.contain(\"Error\");\r",
+							"    pm.expect(jsonData.result).to.eq(null);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"The Partner\",\r\n    \"author\": \"John Grisham\",\r\n    \"year\": 1994,\r\n    \"price\": 70,\r\n    \"genres\": [\"ROMANCE\",\"PROFESSIONAL\"]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:{{port}}/book",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"book"
+					],
+					"query": [
+						{
+							"key": "persistenceMethod",
+							"value": "{{persistenceMethod}}",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get total Books from POSTGRES",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Initial quanitiy of 2 books in postgres DB\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.result).to.eql(2);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:{{port}}/books/total?persistenceMethod=POSTGRES",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"books",
+						"total"
+					],
+					"query": [
+						{
+							"key": "author",
+							"value": "abc",
+							"disabled": true
+						},
+						{
+							"key": "price-bigger-than",
+							"value": "65",
+							"disabled": true
+						},
+						{
+							"key": "price-less-than",
+							"value": "88",
+							"disabled": true
+						},
+						{
+							"key": "year-bigger-than",
+							"value": "1998",
+							"disabled": true
+						},
+						{
+							"key": "year-less-than",
+							"value": "2000",
+							"disabled": true
+						},
+						{
+							"key": "genres",
+							"value": "PROFESSIONAL",
+							"disabled": true
+						},
+						{
+							"key": "persistenceMethod",
+							"value": "POSTGRES"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get total Books from MONGO",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Initial quanitiy of 2 books in postgres DB\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.result).to.eql(2);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:{{port}}/books/total?persistenceMethod=MONGO",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"books",
+						"total"
+					],
+					"query": [
+						{
+							"key": "author",
+							"value": "abc",
+							"disabled": true
+						},
+						{
+							"key": "price-bigger-than",
+							"value": "65",
+							"disabled": true
+						},
+						{
+							"key": "price-less-than",
+							"value": "88",
+							"disabled": true
+						},
+						{
+							"key": "year-bigger-than",
+							"value": "1998",
+							"disabled": true
+						},
+						{
+							"key": "year-less-than",
+							"value": "2000",
+							"disabled": true
+						},
+						{
+							"key": "genres",
+							"value": "PROFESSIONAL",
+							"disabled": true
+						},
+						{
+							"key": "persistenceMethod",
+							"value": "MONGO"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create New Book",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"third book ID expected to be 3\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.result).to.eql(3);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"half proof\",\r\n    \"author\": \"Uri Levron\",\r\n    \"year\": 2010,\r\n    \"price\": 89,\r\n    \"genres\": [\"ROMANCE\",\"NOVEL\"]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:{{port}}/book",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"book"
+					],
+					"query": [
+						{
+							"key": "persistenceMethod",
+							"value": "{{persistenceMethod}}",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Books by genres:  NOVEL from MONGO",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"should have 1 book in these genres\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.result.length).to.eql(1);\r",
+							"    pm.expect(jsonData.result[0].title).to.eql(\"half proof\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:{{port}}/books?genres=NOVEL&persistenceMethod=MONGO",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"books"
+					],
+					"query": [
+						{
+							"key": "author",
+							"value": "abc",
+							"disabled": true
+						},
+						{
+							"key": "price-bigger-than",
+							"value": "65",
+							"disabled": true
+						},
+						{
+							"key": "price-less-than",
+							"value": "75",
+							"disabled": true
+						},
+						{
+							"key": "year-bigger-than",
+							"value": "2000",
+							"disabled": true
+						},
+						{
+							"key": "year-less-than",
+							"value": "1998",
+							"disabled": true
+						},
+						{
+							"key": "genres",
+							"value": "NOVEL"
+						},
+						{
+							"key": "persistenceMethod",
+							"value": "MONGO"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Books by price bigger than 80 from POSTGRES",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"should have 1 book in these genres\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.result.length).to.eql(1);\r",
+							"    pm.expect(jsonData.result[0].author).to.eql(\"Uri Levron\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:{{port}}/books?price-bigger-than=80&persistenceMethod=POSTGRES",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"books"
+					],
+					"query": [
+						{
+							"key": "author",
+							"value": "abc",
+							"disabled": true
+						},
+						{
+							"key": "price-bigger-than",
+							"value": "80"
+						},
+						{
+							"key": "price-less-than",
+							"value": "75",
+							"disabled": true
+						},
+						{
+							"key": "year-bigger-than",
+							"value": "2000",
+							"disabled": true
+						},
+						{
+							"key": "year-less-than",
+							"value": "1998",
+							"disabled": true
+						},
+						{
+							"key": "genres",
+							"value": "NOVEL",
+							"disabled": true
+						},
+						{
+							"key": "persistenceMethod",
+							"value": "POSTGRES"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Book 2 price to 90",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"old book price is 50\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.result).to.eql(50);    \r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:{{port}}/book?id=2&price=90",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"book"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "2"
+						},
+						{
+							"key": "price",
+							"value": "90"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Book 2 details from MONGO",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"first book year\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.result.price).to.eql(90);    \r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:{{port}}/book?id=2&persistenceMethod=MONGO",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"book"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "2"
+						},
+						{
+							"key": "persistenceMethod",
+							"value": "MONGO"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Book 2 details from POSTGRES",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"first book year\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.result.price).to.eql(90);    \r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:{{port}}/book?id=2&persistenceMethod=POSTGRES",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"book"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "2"
+						},
+						{
+							"key": "persistenceMethod",
+							"value": "POSTGRES"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete second Book",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"delete a book and remain with 2\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.result).to.eql(2);    \r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:{{port}}/book?id=2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"book"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get total Books from POSTGRES",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"quanitiy of 2 books in postgres DB\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.result).to.eql(2);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:{{port}}/books/total?persistenceMethod=POSTGRES",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"books",
+						"total"
+					],
+					"query": [
+						{
+							"key": "author",
+							"value": "abc",
+							"disabled": true
+						},
+						{
+							"key": "price-bigger-than",
+							"value": "65",
+							"disabled": true
+						},
+						{
+							"key": "price-less-than",
+							"value": "88",
+							"disabled": true
+						},
+						{
+							"key": "year-bigger-than",
+							"value": "1998",
+							"disabled": true
+						},
+						{
+							"key": "year-less-than",
+							"value": "2000",
+							"disabled": true
+						},
+						{
+							"key": "genres",
+							"value": "PROFESSIONAL",
+							"disabled": true
+						},
+						{
+							"key": "persistenceMethod",
+							"value": "POSTGRES"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get total Books from MONGO",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"quanitiy of 2 books in postgres DB\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.result).to.eql(2);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:{{port}}/books/total?persistenceMethod=MONGO",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"books",
+						"total"
+					],
+					"query": [
+						{
+							"key": "author",
+							"value": "abc",
+							"disabled": true
+						},
+						{
+							"key": "price-bigger-than",
+							"value": "65",
+							"disabled": true
+						},
+						{
+							"key": "price-less-than",
+							"value": "88",
+							"disabled": true
+						},
+						{
+							"key": "year-bigger-than",
+							"value": "1998",
+							"disabled": true
+						},
+						{
+							"key": "year-less-than",
+							"value": "2000",
+							"disabled": true
+						},
+						{
+							"key": "genres",
+							"value": "PROFESSIONAL",
+							"disabled": true
+						},
+						{
+							"key": "persistenceMethod",
+							"value": "MONGO"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
