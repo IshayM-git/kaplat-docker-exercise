@@ -5,7 +5,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-from database import get_all_books, get_books_count
+from database import connect_databases, get_all_books, get_books_count
 
 
 # ======================== Test helpers ========================
@@ -45,6 +45,8 @@ def assert_both_databases_equal() -> None:
 def main() -> None:
     os.environ["DATABASE_URL"] = "postgresql+psycopg://postgres:docker@localhost:5432/books"
     os.environ["MONGO_URL"] = "mongodb://localhost:27017/books"
+
+    connect_databases()
 
     # Postman flow leaves books 1 and 3 in both databases.
     assert get_books_count("POSTGRES") == 2
